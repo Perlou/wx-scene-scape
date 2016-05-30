@@ -12,13 +12,14 @@ function slideObj(){
 	this.oMain = $('#main');
 	this.oList = $('#list');
 	this.oLi = this.oList.find('li');
+	this.oLoading = $('#loading');
 	this.viewHeight = $(window).height();
 	this.desW = 640;
 	this.desH = 960;
 
 	//Canvas
-	// this.oCanvas = $('#c1').get(0);
-	// this.oGC = this.oCanvas.getContext('2d');
+	this.oCanvas = $('#c1').get(0);
+	this.oGC = this.oCanvas.getContext('2d');
 
 	this.init(); // 初始化
 }
@@ -26,8 +27,12 @@ function slideObj(){
 slideObj.prototype.init = function(){
 	var _this = this;
 	_this.set();
-	// _this.slideCanvas();
+	_this.slideCanvas();
 	_this.slideList();
+};
+
+slideObj.prototype.loading = function(){
+	var _this = this;
 };
 
 slideObj.prototype.set = function(){
@@ -73,7 +78,7 @@ slideObj.prototype.slideCanvas = function(){
 			_this.oGC.lineTo(x,y);
 		}
 
-		// _this.oGC.stroke();
+		_this.oGC.stroke();
 
 		$(_this.oCanvas).on('touchmove.move', function(ev){
 			var touch = ev.originalEvent.changedTouches[0];
@@ -142,7 +147,7 @@ slideObj.prototype.slideList = function(){
 					'WebkitTransform': 'translate3d(0,'+ ( -_this.viewHeight + moveY - downY) +'px,0)'
 				});
 			}
-			// console.log(nextIndex);
+
 			_this.oLi.eq(nextIndex).show().addClass('zIndex');
 			$(this).css({
 				'WebkitTransform': 'translate3d(0,'+ (moveY - downY)*step +'px,0) scale('+(1-Math.abs(moveY - downY)/_this.viewHeight*step) +')'

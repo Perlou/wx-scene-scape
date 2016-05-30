@@ -11,7 +11,19 @@
 
 	<section id="main">
 		
-		<!-- <canvas id="c1" width="640" height="960"></canvas>	 -->
+		<div id="loading">
+	    	<ul>
+	        	<li></li>
+	            <li></li>
+	            <li></li>
+	            <li></li>
+	            <li></li>
+	            <li></li>
+	        </ul>
+	        <span>你的技能是否已经载满....</span>		
+		</div>
+
+		<canvas id="c1" width="640" height="960"></canvas>	
 
 		<ul id="list">
 			<li></li>
@@ -23,8 +35,12 @@
 			<li></li>
 			<li></li>
 		</ul>
-
+		<div id="arrow"></div>
+	    <div id="music">
+	    	<audio id="audio1" src="./images/music.mp3" preload="auto" loop></audio>
+	    </div>
 	</section>
+
 
 	<script type="text/javascript" src="./assets/app.js"></script>
 </body>
