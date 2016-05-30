@@ -4,6 +4,8 @@
  * @exports {obj} slideObj
  */
 
+'use strict';
+
 //js
 var $ = require('jquery');
 
@@ -13,6 +15,9 @@ function slideObj(){
 	this.oList = $('#list');
 	this.oLi = this.oList.find('li');
 	this.oLoading = $('#loading');
+	this.oMusic = $('#music');
+	this.oAudio = $('#audio1');
+
 	this.viewHeight = $(window).height();
 	this.desW = 640;
 	this.desH = 960;
@@ -27,13 +32,68 @@ function slideObj(){
 slideObj.prototype.init = function(){
 	var _this = this;
 	_this.set();
-	_this.slideCanvas();
+	_this.loading();
 	_this.slideList();
 };
 
 slideObj.prototype.loading = function(){
-	var _this = this;
+	
+	var _this = this,
+		imageArr = [
+			require('../images/a.png'),
+			require('../images/b.png'),
+			require('../images/c.png'),
+			require('../images/d.png'),
+			require('../images/e.png'),
+			require('../images/ad1.png'),
+			require('../images/ad2.png'),
+			require('../images/ad3.png'),
+			require('../images/ad4.png')
+		],
+		iNow = 0;
+
+	for(var i = 0; i<imageArr.length; i++){
+		var objImg = new Image();
+		objImg.src = imageArr[i];
+		objImg.onload = function(){
+			iNow++;
+			if(iNow == imageArr.length){
+				next();
+			}
+		};
+		objImg.onerror = function(){
+			next();		
+		};
+	}	
+
+	function next(){
+		_this.oLoading.animate({
+			opacity: 0
+		}, 1000, function(){
+			_this.oLoading.remove();
+		});		
+		_this.slideCanvas();
+
+	}
+		
 };
+
+slideObj.prototype.music = function(){
+	var _this = this,
+		musicBtn = true;
+
+	_this.oMusic.on('touchend', function(){
+		if(musicBtn){
+			$(this).attr('class', 'active');
+			_this.oAudio.get(0).play();
+		}else{
+			$(this).attr('class', '');
+			_this.oAudio.get(0).pause();
+		}
+		musicBtn = !musicBtn;
+	});	
+	_this.oMusic.trigger('touchend');
+};	
 
 slideObj.prototype.set = function(){
 	var _this = this;
@@ -104,6 +164,7 @@ slideObj.prototype.slideCanvas = function(){
 				$(_this.oCanvas).stop().animate({
 					opacity: 0
 				},1000,function(){
+					_this.music();
 					$(_this.oCanvas).remove();
 				});
 			}

@@ -1,6 +1,5 @@
 {
   "name": "scape",
-  "private": true,
   "version": "0.0.1",
   "description": "Scape",
   "main": "webpack.config.js",
@@ -19,9 +18,12 @@
     "test": "karma start",
     "test:watch": "karma start --autoWatch=true --singleRun=false"
   },
-  "repository": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Perlou/wx-scene-scape.git"
+  },
   "keywords": [],
-  "author": "Your name here",
+  "author": "Perlou",
   "devDependencies": {
     "babel-core": "^6.0.0",
     "babel-eslint": "^6.0.0",
