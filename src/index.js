@@ -3,8 +3,15 @@
  * @index.js
  */
 
+//css 
+require('./styles/App.css');
+
 var $ = require('jquery');
-console.log($);
+var slideObj = require('./js/slideObj');
+
+$(document).ready(function(){
+	var slide = new slideObj();
+});
 
  //canvas像素级操作必须在服务器下运行才可以，课上忘说了
 // $(document).on('touchmove',function(ev){
