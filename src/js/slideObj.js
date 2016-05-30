@@ -17,8 +17,8 @@ function slideObj(){
 	this.desH = 960;
 
 	//Canvas
-	this.oCanvas = $('#c1').get(0);
-	this.oGC = this.oCanvas.getContext('2d');
+	// this.oCanvas = $('#c1').get(0);
+	// this.oGC = this.oCanvas.getContext('2d');
 
 	this.init(); // 初始化
 }
@@ -26,7 +26,8 @@ function slideObj(){
 slideObj.prototype.init = function(){
 	var _this = this;
 	_this.set();
-	_this.slideCanvas();
+	// _this.slideCanvas();
+	_this.slideList();
 };
 
 slideObj.prototype.set = function(){
@@ -84,61 +85,115 @@ slideObj.prototype.slideCanvas = function(){
 		});
 
 		$(_this.oCanvas).on('touchend.move', function(ev){
+			var dataImg = _this.oGC.getImageData(0,0,_this.oCanvas.width,_this.oCanvas.height),
+				allPx = dataImg.width * dataImg.height,
+				iNum = 0;
+
+			for(var i=0; i<allPx; i++){
+				if(dataImg.data[i*4+3] == 0 ){
+					iNum++;
+				}
+			}	
+
+			if(iNum > allPx/2){
+				$(_this.oCanvas).stop().animate({
+					opacity: 0
+				},1000,function(){
+					$(_this.oCanvas).remove();
+				});
+			}
 			$(_this.oCanvas).off('.move');
-			_this.oGC.closePath();
 		});
 
 	});
-	// 			// $(oC).on('touchstart',function(ev){
-				// var touch = ev.originalEvent.changedTouches[0];
-				// var x = touch.pageX - $(this).offset().left;
-				// var y = touch.pageY - $(this).offset().top;
-				
-				/*oGC.beginPath();
-				oGC.arc(x,y,100,0,360*Math.PI/180);
-				oGC.closePath();
-				oGC.fill();*/
-			// 	if(bBtn){
-			// 		bBtn = false;
-			// 		oGC.moveTo(x,y);
-			// 		oGC.lineTo(x+1,y+1);
-			// 	}
-			// 	else{
-			// 		oGC.lineTo(x,y);
-			// 	}
-				
-			// 	oGC.stroke();
-				
-			// 	$(oC).on('touchmove.move',function(ev){
-			// 		var touch = ev.originalEvent.changedTouches[0];
-			// 		var x = touch.pageX - $(this).offset().left;
-			// 		var y = touch.pageY - $(this).offset().top;
-			// 		oGC.lineTo(x,y);
-			// 		oGC.stroke();
-			// 	});
-			// 	$(oC).on('touchend.move',function(){
-					
-			// 		var dataImg = oGC.getImageData(0,0,oC.width,oC.height);
-					
-			// 		var allPx = dataImg.width * dataImg.height;
-			// 		var iNum = 0;
-					
-			// 		for(var i=0;i<allPx;i++){
-			// 			if(dataImg.data[i*4+3] == 0){
-			// 				iNum++;
-			// 			}
-			// 		}
-					
-			// 		if( iNum > allPx/2 ){
-			// 			$(oC).animate({opacity:0},1000,function(){
-			// 				$(this).remove();
-			// 				cjAnimate[0].inAn();
-			// 				showMusic();
-			// 			});
-			// 		}
-			// 		$(oC).off('.move');
-			// 	});
-			// });
+
+};
+
+slideObj.prototype.slideList = function(){
+	var _this = this,
+		downY = 0,
+		moveY = 0,
+		step = 1/4,
+		listBtn = true,
+		nowIndex = 0,
+		nextIndex = 0;
+
+	_this.oLi.css('backgroundPosition', ( (_this.desW -_this.nowWidth())/2 ) +'px 0')
+	_this.oLi.on('touchstart', function(ev){
+		if(!listBtn){return;}
+		listBtn = false;
+
+		nowIndex = $(this).index();
+		downY = ev.originalEvent.changedTouches[0].pageY;
+
+		_this.oLi.on('touchmove', function(ev){
+			moveY = ev.originalEvent.changedTouches[0].pageY;
+			$(this).siblings().hide();
+			if(downY > moveY) { //向上滑动
+				nextIndex = nowIndex == _this.oLi.length - 1 ? 0 : nowIndex + 1;
+				_this.oLi.eq(nextIndex).css({
+					'transform': 'translate3d(0,'+ ( _this.viewHeight + moveY - downY) +'px,0)',
+					'WebkitTransform': 'translate3d(0,'+ ( _this.viewHeight + moveY - downY) +'px,0)'
+				});
+			}else { //向下滑动
+				nextIndex = nowIndex == 0 ? _this.oLi.length - 1 : nowIndex - 1;
+				_this.oLi.eq(nextIndex).css({
+					'transform': 'translate3d(0,'+ ( -_this.viewHeight + moveY - downY) +'px,0)',
+					'WebkitTransform': 'translate3d(0,'+ ( -_this.viewHeight + moveY - downY) +'px,0)'
+				});
+			}
+			// console.log(nextIndex);
+			_this.oLi.eq(nextIndex).show().addClass('zIndex');
+			$(this).css({
+				'WebkitTransform': 'translate3d(0,'+ (moveY - downY)*step +'px,0) scale('+(1-Math.abs(moveY - downY)/_this.viewHeight*step) +')'
+			})
+
+		});
+
+		_this.oLi.on('touchend', function(ev){
+
+			if(downY > moveY) {
+				$(this).css({
+					'transform': 'translate3d(0,'+(-_this.viewHeight * step)+'px,0) scale('+(1-step)+')',
+					'WebkitTransform': 'translate3d(0,'+(-_this.viewHeight * step)+'px,0) scale('+(1-step)+')'
+				})
+			}else if(downY < moveY) {
+				$(this).css({
+					'transform': 'translate3d(0,'+(_this.viewHeight * step)+'px,0) scale('+(1-step)+')',
+					'WebkitTransform': 'translate3d(0,'+(_this.viewHeight * step)+'px,0) scale('+(1-step)+')'
+				})
+			}else {
+				listBtn = true;
+				return;
+			}
+
+			$(this).css({
+				'transition': '0.3s',
+				'WebkitTransition': '0.3s'
+			})
+			_this.oLi.eq(nextIndex).css({
+				'transform': 'translate3d(0,0,0)',
+				'transition': '0.3s',
+				'WebkitTransform': 'translate3d(0,0,0)',
+				'WebkitTransition': '0.3s'
+			})
+		});
+
+	});	
+
+	_this.oLi.on('transitionEnd webkitTransitionEnd',function(){
+		resetStyle();
+	})
+
+	function resetStyle(){
+		_this.oLi.css({
+			'transition': '',
+			'WebkitTransition': ''			
+		});
+		_this.oLi.eq(nextIndex).removeClass('zIndex').siblings().hide();
+		listBtn = true;
+	}
+		
 };
 
 slideObj.prototype.nowWidth = function(){
